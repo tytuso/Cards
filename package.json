@@ -1,0 +1,11 @@
+{
+  "name": "cards-matatu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cards — a modern, offline-ready Matatu game from Nile AI Solutions.",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/app.js && node --check src/game-engine.js && node --check sw.js"
+  }
+}

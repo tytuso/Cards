@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101714">
+  <meta name="description" content="Cards is Nile AI's modern, offline-ready take on Matatu, the East African card game.">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <title>Cards — Nile AI</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Cards home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><rect x="6" y="9" width="19" height="25" rx="5" transform="rotate(-12 6 9)"/><rect x="15" y="6" width="19" height="25" rx="5"/><path d="M24.5 12.5c-1.4 0-2.4 1-2.4 2.2 0 1.8 2.4 3.7 2.4 3.7s2.4-1.9 2.4-3.7c0-1.2-1-2.2-2.4-2.2Z"/></svg></span>
+        <span><strong>Cards</strong><small>BY NILE AI</small></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="offline-pill"><i></i><span>Ready offline</span></span>
+        <button class="top-icon" data-action="toggle-sound" aria-label="Toggle sound" title="Toggle sound"><span id="sound-icon">♫</span></button>
+        <button class="top-icon" data-action="open-rules" aria-label="How to play" title="How to play">?</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="home-screen" class="home-screen" aria-labelledby="home-title">
+        <div class="welcome-copy">
+          <div class="kicker"><span class="kicker-line"></span> A CLASSIC, REDEALT</div>
+          <h1 id="home-title">Your next<br><em>great game.</em></h1>
+          <p class="welcome-desc">Matatu, the way it should feel: quick to learn, hard to put down.</p>
+          <div class="home-cta-row">
+            <button class="button button-primary button-large" data-action="start-game"><span>Play Matatu</span><span class="button-arrow">↗</span></button>
+            <button class="button button-quiet" data-action="open-rules">Learn the rules <span>↗</span></button>
+          </div>
+          <div class="trust-row"><span class="trust-check">✓</span> Free to play <span class="trust-sep">·</span> No account <span class="trust-sep">·</span> Works offline</div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+          <div class="spark spark-a">✦</div><div class="spark spark-b">✳</div>
+          <div class="float-card card-back-art"><span class="card-back-stars">✦</span><span class="card-back-caption">NILE<br>AI</span></div>
+          <div class="float-card art-card art-one"><span class="art-corner">J<br><small>♥</small></span><span class="art-center heart">♥</span><span class="art-corner upside">J<br><small>♥</small></span><span class="art-label">WILD SUIT</span></div>
+          <div class="float-card art-card art-two"><span class="art-corner">8<br><small>♠</small></span><span class="art-center spade">♠</span><span class="art-corner upside">8<br><small>♠</small></span></div>
+          <div class="hero-glint"></div>
+          <div class="art-note"><b>One more round?</b><span>Always.</span></div>
+        </div>
+        <div class="home-bottom">
+          <div class="stat-card"><div class="stat-icon">♛</div><div><span class="stat-value" id="stat-wins">0</span><span class="stat-label">WINS</span></div></div>
+          <div class="stat-card"><div class="stat-icon streak-icon">↗</div><div><span class="stat-value" id="stat-streak">0</span><span class="stat-label">BEST STREAK</span></div></div>
+          <div class="stat-card"><div class="stat-icon">▱</div><div><span class="stat-value" id="stat-games">0</span><span class="stat-label">GAMES PLAYED</span></div></div>
+          <button class="stats-link" data-action="open-stats">Your stats <span>↗</span></button>
+        </div>
+        <div class="home-footer"><span>MADE FOR THE JOY OF A GOOD GAME.</span><span>NILE AI SOLUTIONS <b>●</b></span></div>
+      </section>
+
+      <section id="game-screen" class="game-screen" hidden aria-label="Matatu game">
+        <div class="game-toolbar">
+          <button class="back-button" data-action="leave-game"><span>←</span> <span>Back</span></button>
+          <div class="match-center"><span class="live-dot"></span><span id="match-status">YOUR TURN</span></div>
+          <button class="small-outline" data-action="new-game">New round <span>↻</span></button>
+        </div>
+        <div class="scoreboard">
+          <div class="seat seat-ai"><div class="seat-avatar ai-avatar">N<span>✦</span></div><div class="seat-name-wrap"><b>Nile AI</b><small id="ai-caption">Ready to play</small></div><span class="hand-count" id="ai-count">7 cards</span></div>
+          <div class="round-label"><small>ROUND</small><b id="round-number">01</b></div>
+          <div class="seat seat-player"><span class="hand-count" id="player-count">7 cards</span><div class="seat-name-wrap align-right"><b>You</b><small id="player-caption">Your hand</small></div><div class="seat-avatar player-avatar">T</div></div>
+        </div>
+        <div class="felt-wrap">
+          <div class="felt-noise"></div>
+          <div class="felt-inner">
+            <div class="pile pile-draw"><button class="deck" data-action="draw" aria-label="Draw a card"><span>✦</span><small>NILE AI</small></button><b>DRAW PILE</b><small><span id="deck-count">37</span> cards left</small></div>
+            <div class="discard-zone"><span class="table-caption">ON THE TABLE</span><div id="discard-card" class="discard-card"></div><div class="active-suit"><span id="active-suit-symbol">♠</span><small>SUIT IN PLAY</small><b id="active-suit-name">SPADES</b></div></div>
+            <div class="pile pile-opponent"><div class="opponent-stack"><span class="stack-card stack-3"></span><span class="stack-card stack-2"></span><span class="stack-card stack-1"></span></div><b>OPPONENT</b><small>Cards facedown</small></div>
+          </div>
+          <div id="game-toast" class="game-toast" role="status" aria-live="polite" hidden></div>
+          <div class="turn-callout" id="turn-callout" aria-live="polite">Match the <b>suit or rank</b> to play.</div>
+        </div>
+        <section class="your-hand-section" aria-label="Your hand">
+          <div class="hand-heading"><div><span class="section-overline">YOUR MOVE</span><h2>Your hand <span id="hand-total">7</span></h2></div><span class="hand-hint" id="hand-hint">Tap a card to play it</span></div>
+          <div id="player-hand" class="player-hand" role="list"></div>
+          <div class="hand-actions"><button class="button button-primary" data-action="draw">Draw a card <span class="button-arrow">↗</span></button><button class="button button-outline" data-action="pass" hidden>End turn</button><button class="button button-matatu" data-action="call-matatu" hidden>Call Matatu! <span>✦</span></button></div>
+        </section>
+        <div class="game-footer"><span>♠ &nbsp;♥ &nbsp;♣ &nbsp;♦</span><span>YOUR TABLE. YOUR RULES.</span><button data-action="open-rules">Rules <span>↗</span></button></div>
+      </section>
+    </main>
+  </div>
+  <div id="overlay" class="overlay" hidden><section id="dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"></section></div>
+  <div id="live-region" class="sr-only" aria-live="polite"></div>
+</body>
+</html>

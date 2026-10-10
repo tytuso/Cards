@@ -1,0 +1,15 @@
+{
+  "name": "Cards — Matatu by Nile AI",
+  "short_name": "Cards",
+  "description": "A modern, offline-ready take on the East African card game Matatu.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#101714",
+  "theme_color": "#101714",
+  "icons": [
+    { "src": "./assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
