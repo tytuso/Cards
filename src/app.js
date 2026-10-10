@@ -115,7 +115,7 @@ function syncGame() {
   drawButtons.forEach(button => {
     const penalty = s.penalty;
     button.innerHTML = penalty ? `Take ${penalty} cards <span class="button-arrow">↗</span>` : 'Draw a card <span class="button-arrow">↗</span>';
-    button.disabled = !isPlayerTurn || s.status !== 'playing' || Boolean(s.drawnCardId) || (!penalty && hasPlayable) || !s.drawPile.length;
+    button.disabled = !isPlayerTurn || s.status !== 'playing' || Boolean(s.drawnCardId) || (!penalty && hasPlayable);
   });
   $('[data-action="pass"]').hidden = !Boolean(s.drawnCardId) || hasPlayable || !isPlayerTurn || s.status !== 'playing';
   $('[data-action="call-matatu"]').hidden = !s.mustCallMatatu;
