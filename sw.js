@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nile-cards-v1';
+const CACHE_NAME = 'nile-cards-v2';
 const APP_FILES = [
   './',
   './index.html',
@@ -36,3 +36,4 @@ self.addEventListener('fetch', event => {
     return response;
   })));
 });
+

@@ -23,10 +23,13 @@ function suitColor(suit) { return suit === '♥' || suit === '♦' ? 'red' : 'bl
 
 function cardMarkup(card, { hand = false, playable = false, drawn = false } = {}) {
   const effect = cardEffect(card.rank);
+  const isJoker = card.rank === 'JOKER';
+  const label = isJoker ? 'Joker' : `${card.rank} of ${SUIT_NAMES[card.suit]}`;
+  const face = isJoker ? '★' : card.rank;
   const tag = effect ? `<span class="card-effect">${effect}</span>` : '';
-  const corner = `<span class="pc-corner">${card.rank}<br><small>${card.suit}</small></span>`;
-  if (!hand) return `<div class="playing-card ${suitColor(card.suit)}" aria-label="${card.rank} of ${SUIT_NAMES[card.suit]}">${corner}<span class="pc-suit">${card.suit}</span>${effect ? `<span class="card-effect">${effect}</span>` : ''}<span class="pc-corner pc-bottom">${card.rank}<br><small>${card.suit}</small></span></div>`;
-  return `<button class="hand-card ${suitColor(card.suit)} ${playable ? 'is-playable' : ''} ${drawn ? 'is-drawn' : ''}" data-action="play-card" data-card-id="${card.id}" role="listitem" aria-label="${card.rank} of ${SUIT_NAMES[card.suit]}${effect ? `, ${effect.toLowerCase()}` : ''}" ${playable ? '' : 'disabled'}>${corner}<span class="pc-suit">${card.suit}</span>${tag}<span class="pc-corner pc-bottom">${card.rank}<br><small>${card.suit}</small></span></button>`;
+  const corner = `<span class="pc-corner">${face}<br><small>${isJoker ? 'WILD' : card.suit}</small></span>`;
+  if (!hand) return `<div class="playing-card ${suitColor(card.suit)} ${isJoker ? 'joker-card' : ''}" aria-label="${label}">${corner}<span class="pc-suit">${isJoker ? '★' : card.suit}</span>${tag}<span class="pc-corner pc-bottom">${face}<br><small>${isJoker ? 'WILD' : card.suit}</small></span></div>`;
+  return `<button class="hand-card ${suitColor(card.suit)} ${isJoker ? 'joker-card' : ''} ${playable ? 'is-playable' : ''} ${drawn ? 'is-drawn' : ''}" data-action="play-card" data-card-id="${card.id}" role="listitem" aria-label="${label}${effect ? `, ${effect.toLowerCase()}` : ''}" ${playable ? '' : 'disabled'}>${corner}<span class="pc-suit">${isJoker ? '★' : card.suit}</span>${tag}<span class="pc-corner pc-bottom">${face}<br><small>${isJoker ? 'WILD' : card.suit}</small></span></button>`;
 }
 
 function setScreen(which) {
@@ -91,6 +94,7 @@ function syncGame() {
   $('#active-suit-symbol').textContent = s.activeSuit;
   $('#active-suit-symbol').className = suitColor(s.activeSuit);
   $('#active-suit-name').textContent = SUIT_NAMES[s.activeSuit].toUpperCase();
+  $('#cut-suit-symbol').textContent = s.cutSuit;
   $('#match-status').textContent = s.status === 'finished' ? 'ROUND COMPLETE' : isPlayerTurn ? 'YOUR TURN' : 'NILE AI TURN';
   $('#ai-caption').textContent = s.status === 'finished' ? (s.winner === 'ai' ? 'Won this round' : 'Good game') : !isPlayerTurn ? 'Making a move…' : 'Cards facedown';
   $('#player-caption').textContent = s.status === 'finished' ? (s.winner === 'player' ? 'Round winner' : 'Next round?') : isPlayerTurn ? 'Make your move' : 'Waiting on Nile AI';
@@ -105,12 +109,15 @@ function syncGame() {
 
   const banner = $('#turn-callout');
   if (s.status === 'finished') banner.innerHTML = s.winner === 'player' ? '<b>You got there first. Matatu!</b>' : 'Nile AI wins this round. Deal again?';
-  else if (s.penalty) banner.innerHTML = `Pickup penalty: <b>${s.penalty} cards</b> · stack a 2 or 3, or draw.`;
+  else if (s.penalty) banner.innerHTML = `Pickup penalty: <b>${s.penalty} cards</b> · stack an attack card or draw.`;
   else if (!isPlayerTurn) banner.innerHTML = '<b>Nile AI</b> is deciding its next move.';
   else if (s.drawnCardId) banner.innerHTML = 'You drew a card. Play it if you can, or <b>end your turn.</b>';
   else banner.innerHTML = 'Match the <b>suit or rank</b> to play.';
 
   const hasPlayable = game.playableCards('player').length > 0;
+  const cutButton = $('[data-action="cut"]');
+  cutButton.hidden = !game.canCut('player');
+  cutButton.textContent = `Cut game · ${game.points('player')} pts`;
   const drawButtons = $$('[data-action="draw"]');
   drawButtons.forEach(button => {
     const penalty = s.penalty;
@@ -156,7 +163,7 @@ function handlePlay(cardId, suit) {
     toast('Call Matatu before you play your last card.');
     return;
   }
-  if (card.rank === 'J' && !suit) { pendingJack = cardId; suitDialog(); return; }
+  if (['A', 'JOKER'].includes(card.rank) && !suit) { pendingJack = cardId; suitDialog(card.rank); return; }
   const result = game.play(cardId, { player: 'player', suit });
   if (!result.ok) return;
   clearMatatuTimer();
@@ -168,8 +175,10 @@ function handlePlay(cardId, suit) {
 
 function effectMessage(card, effect) {
   if (card.rank === '2' || card.rank === '3') return `You played ${card.rank}. The pickup penalty is now ${game.state.penalty}.`;
-  if (card.rank === '8') return 'Eight skips Nile AI. You keep the turn.';
-  return `Jack played. ${SUIT_NAMES[game.state.activeSuit]} is in play.`;
+  if (card.rank === '8' || card.rank === 'J') return `${card.rank === '8' ? 'Eight' : 'Jack'} skips Nile AI. You keep the turn.`;
+  if (card.rank === 'JOKER') return `Joker played. Pickup penalty is now ${game.state.penalty}; ${SUIT_NAMES[game.state.activeSuit]} is in play.`;
+  if (card.rank === 'A') return `Ace played. ${SUIT_NAMES[game.state.activeSuit]} is in play.`;
+  return `Pickup penalty is now ${game.state.penalty}.`;
 }
 
 function scheduleAi() {
@@ -180,7 +189,8 @@ function scheduleAi() {
     if (!result.ok) return;
     playSound('soft');
     if (result.cards?.length) toast(result.penalty ? `Nile AI picked up ${result.cards.length} cards.` : 'Nile AI drew a card.');
-    else if (result.card?.rank === 'J') toast(`Nile AI chose ${SUIT_NAMES[game.state.activeSuit]}.`);
+    else if (['A', 'JOKER'].includes(result.card?.rank)) toast(`Nile AI chose ${SUIT_NAMES[game.state.activeSuit]}.`);
+    else if (result.card?.rank === 'J') toast('Jack skips your turn. Nile AI plays again.');
     else if (result.card?.rank === '8') toast('Eight skips your turn. Nile AI plays again.');
     else if (result.card?.rank === '2' || result.card?.rank === '3') toast(`Nile AI stacked a ${result.card.rank}. Pickup penalty: ${game.state.penalty}.`);
     syncGame();
@@ -204,16 +214,20 @@ function finishMatch() {
   saveProfile();
   refreshHome();
   const won = game.state.winner === 'player';
+  const resultCopy = game.state.cut
+    ? `Cut points: You ${game.points('player')} · Nile AI ${game.points('ai')}.`
+    : won ? 'You emptied your hand first. That was a sharp round.' : 'Nile AI cleared its hand first this time. Shuffle and take another shot.';
+  const resultTitle = game.state.cut ? (won ? 'Cut won!' : 'Cut lost.') : (won ? 'Matatu!' : 'Good game.');
   openModal(`<div class="dialog-kicker">${won ? 'NICE HAND' : 'NEXT ROUND IS YOURS'}</div>
-    <h2 id="dialog-title">${won ? 'Matatu!' : 'Good game.'}</h2>
-    <p class="dialog-intro">${won ? 'You emptied your hand first. That was a sharp round.' : 'Nile AI cleared its hand first this time. Shuffle and take another shot.'}</p>
+    <h2 id="dialog-title">${resultTitle}</h2>
+    <p class="dialog-intro">${resultCopy}</p>
     <div class="result-score">${profile.wins} WIN${profile.wins === 1 ? '' : 'S'} &nbsp;·&nbsp; ${profile.games} GAME${profile.games === 1 ? '' : 'S'} PLAYED</div>
     <div class="dialog-actions"><button class="button button-outline" data-action="home">Home</button><button class="button button-primary" data-action="rematch">Play again <span class="button-arrow">↗</span></button></div>`);
 }
 
-function suitDialog() {
+function suitDialog(rank = 'A') {
   openModal(`<button class="dialog-close" data-action="close-dialog" aria-label="Close">×</button>
-    <div class="dialog-kicker">A JACK IS A WILD SUIT</div><h2 id="dialog-title">What suit next?</h2>
+    <div class="dialog-kicker">${rank === 'JOKER' ? 'JOKER · PICK UP FIVE' : 'ACE · CHOOSE THE SUIT'}</div><h2 id="dialog-title">What suit next?</h2>
     <p class="dialog-intro">Choose the suit Nile AI has to follow.</p>
     <div class="suit-grid">${SUITS.map(suit => `<button class="suit-pick ${suitColor(suit)}" data-action="choose-suit" data-suit="${suit}" aria-label="${SUIT_NAMES[suit]}">${suit}</button>`).join('')}</div>`);
 }
@@ -221,15 +235,18 @@ function suitDialog() {
 function rulesDialog() {
   openModal(`<button class="dialog-close" data-action="close-dialog" aria-label="Close">×</button>
     <div class="dialog-kicker">QUICK TABLE GUIDE</div><h2 id="dialog-title">How to play Matatu.</h2>
-    <p class="dialog-intro">Clear your hand before Nile AI. Play a card that matches the suit or rank on the table. A Jack can be played on any card.</p>
+    <p class="dialog-intro">Clear your hand before Nile AI. Match the suit or rank. Aces choose the next suit; 8s and Jacks skip the opponent.</p>
     <div class="rule-list">
-      ${rule('2', 'Pickup two', 'The next player draws 2. Stack a 2 or 3 to pass the growing penalty along.')}
-      ${rule('3', 'Pickup three', 'Adds 3 cards to the pickup penalty. Stack another 2 or 3 to pass it on.')}
-      ${rule('8', 'Skip', 'In this two-player game, an 8 skips Nile AI. You get another turn.')}
-      ${rule('J', 'Choose the suit', 'A wild card. Pick Spades, Hearts, Clubs, or Diamonds.')}
+      ${rule('2', 'Pickup two', 'Draw 2 unless you stack a 2, 3, or Joker. The penalty keeps growing.')}
+      ${rule('3', 'Pickup three', 'Adds 3 cards to the pickup penalty. Stack another attack card to pass it on.')}
+      ${rule('8', 'Skip', 'Nile AI loses its turn; you play again.')}
+      ${rule('J', 'Skip', 'A Jack skips Nile AI. You get another turn.')}
+                  ${rule('A', 'Choose a suit', 'An Ace can change the suit. Ace of Spades also blocks a pickup penalty.')}
+      ${rule('★', 'Joker', 'Choose the next suit and add 5 pickup cards. Stack a 2, 3, or Joker to pass it on.')}
+      ${rule('7', 'Cut the game', `Play the 7 of the marked cut suit when your hand is worth ${25} points or less. Lowest points wins.`)}
       ${rule('1', 'Call Matatu', 'When you have one card left, call Matatu within 4 seconds or draw 2.')}
     </div>
-    <div class="rule-note">You may draw one card when you have no playable card. Play it if it fits; otherwise end your turn. Matatu house rules vary, so this game uses one common ruleset.</div>
+    <div class="rule-note">When you cannot play, draw one card. If it fits, play it; otherwise end your turn. A cut uses the 25-point limit and lowest remaining hand score.</div>
     <div class="dialog-actions"><button class="button button-primary" data-action="close-dialog">Got it</button></div>`);
 }
 function rule(rank, title, copy) {
@@ -315,6 +332,11 @@ function handleClick(event) {
   else if (action === 'play-card') handlePlay(target.dataset.cardId);
   else if (action === 'choose-suit') { const cardId = pendingJack; pendingJack = null; closeModal(); handlePlay(cardId, target.dataset.suit); }
   else if (action === 'draw') drawMove();
+  else if (action === 'cut') {
+    const result = game?.cut('player');
+    if (result?.ok) { toast(`Cut! Your ${result.totals.player} points vs Nile AI's ${result.totals.ai}.`); syncGame(); }
+    else toast('You need the 7 of the cut suit and 25 points or less to cut.');
+  }
   else if (action === 'pass') passMove();
   else if (action === 'call-matatu') {
     if (game?.callMatatu()) { clearMatatuTimer(); playSound('play'); toast('Matatu! Nice call.'); syncGame(); }
@@ -358,3 +380,4 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }
 refreshHome();
+

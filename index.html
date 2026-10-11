@@ -72,7 +72,7 @@
           <div class="felt-noise"></div>
           <div class="felt-inner">
             <div class="pile pile-draw"><button class="deck" data-action="draw" aria-label="Draw a card"><span>✦</span><small>NILE AI</small></button><b>DRAW PILE</b><small><span id="deck-count">37</span> cards left</small></div>
-            <div class="discard-zone"><span class="table-caption">ON THE TABLE</span><div id="discard-card" class="discard-card"></div><div class="active-suit"><span id="active-suit-symbol">♠</span><small>SUIT IN PLAY</small><b id="active-suit-name">SPADES</b></div></div>
+            <div class="discard-zone"><span class="table-caption">ON THE TABLE</span><div id="discard-card" class="discard-card"></div><div class="active-suit"><span id="active-suit-symbol">♠</span><small>SUIT IN PLAY</small><b id="active-suit-name">SPADES</b><small>CUT SUIT</small><b id="cut-suit-symbol">♠</b></div></div>
             <div class="pile pile-opponent"><div class="opponent-stack"><span class="stack-card stack-3"></span><span class="stack-card stack-2"></span><span class="stack-card stack-1"></span></div><b>OPPONENT</b><small>Cards facedown</small></div>
           </div>
           <div id="game-toast" class="game-toast" role="status" aria-live="polite" hidden></div>
@@ -81,7 +81,7 @@
         <section class="your-hand-section" aria-label="Your hand">
           <div class="hand-heading"><div><span class="section-overline">YOUR MOVE</span><h2>Your hand <span id="hand-total">7</span></h2></div><span class="hand-hint" id="hand-hint">Tap a card to play it</span></div>
           <div id="player-hand" class="player-hand" role="list"></div>
-          <div class="hand-actions"><button class="button button-primary" data-action="draw">Draw a card <span class="button-arrow">↗</span></button><button class="button button-outline" data-action="pass" hidden>End turn</button><button class="button button-matatu" data-action="call-matatu" hidden>Call Matatu! <span>✦</span></button></div>
+          <div class="hand-actions"><button class="button button-primary" data-action="draw">Draw a card <span class="button-arrow">↗</span></button><button class="button button-outline" data-action="pass" hidden>End turn</button><button class="button button-matatu" data-action="call-matatu" hidden>Call Matatu! <span>✦</span></button><button class="button button-cut" data-action="cut" hidden>Cut game</button></div>
         </section>
         <div class="game-footer"><span>♠ &nbsp;♥ &nbsp;♣ &nbsp;♦</span><span>YOUR TABLE. YOUR RULES.</span><button data-action="open-rules">Rules <span>↗</span></button></div>
       </section>
@@ -91,3 +91,4 @@
   <div id="live-region" class="sr-only" aria-live="polite"></div>
 </body>
 </html>
+

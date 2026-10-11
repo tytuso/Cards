@@ -14,14 +14,14 @@ Open `http://localhost:4173` in a browser. It can also be hosted as a static sit
 
 ## Game rules in this version
 
-- Match the suit or rank of the card on the table.
-- **2** adds a two-card pickup penalty; **3** adds three. Either can be stacked on an active pickup penalty.
-- **8** skips the other player. In a two-player game, you keep the turn.
-- **Jack** is wild; choose the suit to continue.
-- Draw one card when you have no playable card. If the drawn card does not fit, end your turn.
-- Call **Matatu** when one card remains. You have four seconds; missing the call adds two cards.
+- Match the suit or rank on the table. An Ace is wild and lets you choose the next suit.
+- **2** adds two pickup cards and **3** adds three. Stack a 2, 3, or Joker to pass the running penalty.
+- **8** and **Jack** skip the opponent in this two-player game.
+- A **Joker** adds five pickup cards and lets you choose the next suit. The **Ace of Spades** cancels a pickup penalty.
+- The cut suit is marked on the table. If you hold its **7** and your hand is worth 25 points or less, cut the round; the lower hand score wins, with a tie going to the other player.
+- Draw when you cannot play. Play the card if it fits, otherwise end your turn. Call **Matatu** with one card left; missing the four-second call adds two cards.
 
-Matatu has regional and family variations. This app uses one common Ugandan-style ruleset and spells it out in the game.
+Matatu has regional and family variations. This build uses a common Ugandan two-player ruleset and shows its rules in the game.
 
 ## Offline and privacy
 
@@ -35,3 +35,4 @@ npm run check
 ```
 
 The game engine is kept separate from the UI so multiplayer, more house rules, and additional game modes can be added later without replacing the card logic.
+

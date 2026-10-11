@@ -26,25 +26,50 @@ test('deals seven cards to each player and starts with a non-action card', () =>
   game.start();
   assert.equal(game.state.hands.player.length, 7);
   assert.equal(game.state.hands.ai.length, 7);
-  assert.equal(game.state.drawPile.length, 37);
-  assert.ok(!['2', '3', '8', 'J'].includes(game.state.discardPile[0].rank));
+  assert.equal(game.state.drawPile.length, 39);
+  assert.ok(!['2', '3', '7', '8', 'J', 'A', 'JOKER'].includes(game.state.discardPile[0].rank));
 });
 
-test('matches a suit or rank and treats Jack as wild', () => {
+test('matches a suit or rank; Jack is not a wild card', () => {
   const game = prepare({ hand: [card('4', '♠'), card('9', '♥'), card('J', '♦')] });
   assert.equal(game.canPlay(game.state.hands.player[0]), true);
   assert.equal(game.canPlay(game.state.hands.player[1]), true);
-  assert.equal(game.canPlay(game.state.hands.player[2]), true);
+  assert.equal(game.canPlay(game.state.hands.player[2]), false);
   assert.equal(game.canPlay(card('5', '♥')), false);
 });
 
-test('a Jack requires a suit choice and changes the active suit', () => {
-  const game = prepare({ hand: [card('J', '♦', 'wild-jack'), card('5', '♣', 'extra')] });
-  assert.deepEqual(game.play('wild-jack'), { ok: false, reason: 'choose-suit' });
-  const result = game.play('wild-jack', { suit: '♣' });
+test('Ace requires a suit choice and changes the active suit', () => {
+  const game = prepare({ hand: [card('A', '♦', 'wild-ace'), card('5', '♣', 'extra')] });
+  assert.deepEqual(game.play('wild-ace'), { ok: false, reason: 'choose-suit' });
+  const result = game.play('wild-ace', { suit: '♣' });
   assert.equal(result.ok, true);
   assert.equal(game.state.activeSuit, '♣');
   assert.equal(game.state.currentPlayer, 'ai');
+});
+test('Joker stacks five pickup cards and lets the player choose suit', () => {
+  const game = prepare({ hand: [card('2', '♥', 'two'), card('JOKER', '★', 'joker'), card('5', '♣', 'extra')], top: card('Q', '♦'), activeSuit: '♥' });
+  game.play('two');
+  game.state.currentPlayer = 'player';
+  const result = game.play('joker', { suit: '♣' });
+  assert.equal(result.ok, true);
+  assert.equal(game.state.penalty, 7);
+  assert.equal(game.state.activeSuit, '♣');
+});
+test('eligible seven cuts and lowest hand points win', () => {
+  const game = prepare({ hand: [card('7', '♣', 'cutter'), card('5', '♥', 'five')], top: card('9', '♠') });
+  game.state.cutSuit = '♣';
+  game.state.hands.ai = [card('K', '♦', 'ai-king')];
+  assert.equal(game.canCut('player'), true);
+  const result = game.cut('player');
+  assert.equal(result.finished, true);
+  assert.equal(result.winner, 'player');
+  assert.deepEqual(result.totals, { player: 12, ai: 13 });
+});
+test('cut is rejected when the hand exceeds the limit', () => {
+  const game = prepare({ hand: [card('7', '♣', 'cutter'), card('A', '♠', 'ace')], top: card('9', '♠') });
+  game.state.cutSuit = '♣';
+  assert.equal(game.canCut('player'), false);
+  assert.deepEqual(game.cut('player'), { ok: false, reason: 'cannot-cut' });
 });
 
 test('2 and 3 add to the pickup penalty and can be stacked', () => {
@@ -90,3 +115,4 @@ test('playing the final card ends the round and records the winner', () => {
   assert.equal(game.state.status, 'finished');
   assert.equal(game.state.winner, 'player');
 });
+
