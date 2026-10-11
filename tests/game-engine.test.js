@@ -63,13 +63,22 @@ test('eligible seven cuts and lowest hand points win', () => {
   const result = game.cut('player');
   assert.equal(result.finished, true);
   assert.equal(result.winner, 'player');
-  assert.deepEqual(result.totals, { player: 12, ai: 13 });
+  assert.deepEqual(result.totals, { player: 5, ai: 13 });
+  assert.equal(game.state.hands.player.some(item => item.id === 'cutter'), false);
 });
 test('cut is rejected when the hand exceeds the limit', () => {
   const game = prepare({ hand: [card('7', '♣', 'cutter'), card('A', '♠', 'ace')], top: card('9', '♠') });
   game.state.cutSuit = '♣';
   assert.equal(game.canCut('player'), false);
   assert.deepEqual(game.cut('player'), { ok: false, reason: 'cannot-cut' });
+});
+test('the cut seven is removed before checking the point limit', () => {
+  const game = prepare({ hand: [card('7', '♣', 'cutter'), card('2', '♥'), card('4', '♦')], top: card('9', '♠') });
+  game.state.cutSuit = '♣';
+  assert.equal(game.points('player'), 31);
+  assert.equal(game.canCut('player'), true);
+  const result = game.cut('player');
+  assert.equal(result.totals.player, 24);
 });
 
 test('2 and 3 add to the pickup penalty and can be stacked', () => {

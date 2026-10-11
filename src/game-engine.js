@@ -100,13 +100,16 @@ export class MatatuGame {
   points(player) { return this.state.hands[player].reduce((sum, card) => sum + cardPoints(card), 0); }
 
   canCut(player = this.state.currentPlayer) {
+    const cutter = this.state.hands[player].find(card => card.rank === '7' && card.suit === this.state.cutSuit);
     return this.state.status === 'playing' && player === this.state.currentPlayer && !this.state.penalty
-      && this.points(player) <= CUT_LIMIT
-      && this.state.hands[player].some(card => card.rank === '7' && card.suit === this.state.cutSuit);
+      && Boolean(cutter) && this.points(player) - cardPoints(cutter) <= CUT_LIMIT;
   }
 
   cut(player = this.state.currentPlayer) {
     if (!this.canCut(player)) return { ok: false, reason: 'cannot-cut' };
+    const hand = this.state.hands[player];
+    const sevenIndex = hand.findIndex(card => card.rank === '7' && card.suit === this.state.cutSuit);
+    hand.splice(sevenIndex, 1);
     const totals = { player: this.points('player'), ai: this.points('ai') };
     const winner = totals.player === totals.ai ? OPPONENT[player] : totals.player < totals.ai ? 'player' : 'ai';
     this.state.status = 'finished'; this.state.winner = winner; this.state.currentPlayer = null; this.state.cut = true;
