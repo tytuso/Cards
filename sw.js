@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nile-cards-v2';
+const CACHE_NAME = 'nile-cards-v3';
 const APP_FILES = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_FILES = [
   './src/app.js',
   './src/game-engine.js',
   './assets/icon.svg',
+  './assets/wood.svg',
 ];
 
 self.addEventListener('install', event => {

@@ -1,15 +1,16 @@
 {
   "name": "Cards — Matatu by Nile AI",
   "short_name": "Cards",
-  "description": "A modern, offline-ready take on the East African card game Matatu.",
+  "description": "Classic Ugandan Matatu, Joker mode, and two players on one device.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#101714",
-  "theme_color": "#101714",
+  "orientation": "any",
+  "background_color": "#9f5424",
+  "theme_color": "#9f5424",
   "icons": [
     { "src": "./assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }
+

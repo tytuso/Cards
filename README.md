@@ -1,31 +1,30 @@
 # Cards — Matatu by Nile AI
 
-Cards is a responsive, single-player version of Matatu. Play offline against Nile AI, learn the rules in-app, and keep your wins and streaks on your device.
+A simple, wooden-table Matatu game inspired by the reference screens supplied by the user. Open Classic, Joker, or 2 players with one tap. The mobile hand overlaps to keep a normal seven-card deal on screen; larger hands scroll. Themes and scores stay on this device.
 
-## Play locally
+## Modes
 
-This is a build-free web app. Serve this folder over HTTP so the browser can load the ES modules and install the service worker:
+- **Classic:** 52 cards, seven per player, against the computer.
+- **Joker:** Classic plus two Jokers. A Joker changes the suit and adds five pickup cards.
+- **2 players:** Classic on one device. A private handover screen hides the next hand until that player is ready.
 
-```sh
-python3 -m http.server 4173
-```
+## Rules
 
-Open `http://localhost:4173` in a browser. It can also be hosted as a static site on GitHub Pages, Vercel, Netlify, or a custom domain.
+The supplied in-app help screenshot is the reference for Classic:
 
-## Game rules in this version
+- Match the table card's suit or rank; empty your hand first to win.
+- Ace chooses the next suit. 2 adds two pickup cards; another 2 stacks the penalty.
+- 8 and Jack skip the other player. 3 is an ordinary matching card.
+- Pick from the deck when there is no match. A non-matching draw ends the turn automatically. A matching draw can be played or forfeited by tapping the table or End turn.
+- The deck's bottom suit sets the cut suit. Lay its 7 when the remaining hand totals **less than 25** points. Lowest points wins; a tied cut favors the opponent.
+- In Joker mode, 2s and Jokers stack penalties together.
+- No timed one-card call is required.
 
-- Match the suit or rank on the table. An Ace is wild and lets you choose the next suit.
-- **2** adds two pickup cards and **3** adds three. Stack a 2, 3, or Joker to pass the running penalty.
-- **8** and **Jack** skip the opponent in this two-player game.
-- A **Joker** adds five pickup cards and lets you choose the next suit. The **Ace of Spades** cancels a pickup penalty.
-- The cut suit is marked on the table. If you hold its **7** and your hand is worth 25 points or less, cut the round; the lower hand score wins, with a tie going to the other player.
-- Draw when you cannot play. Play the card if it fits, otherwise end your turn. Call **Matatu** with one card left; missing the four-second call adds two cards.
+Cut values: A♠ 60, other Aces 15, 2 20, 3 30, J 11, Q 12, K 13, Joker 50; other cards use their numbers. These inherited scoring values and the Joker extension are shown explicitly in Help. The reference screenshot does not enumerate them.
 
-Matatu has regional and family variations. This build uses a common Ugandan two-player ruleset and shows its rules in the game.
+## Offline
 
-## Offline and privacy
-
-The service worker caches the app shell for offline play after the first visit. There is no account, backend, analytics, or network-loaded game asset. Game totals, streaks, sound preference, and difficulty are stored in local browser storage.
+App files and vector assets are cached after the first online visit. No accounts or remote game data are needed. Two-player mode is same-device, not online multiplayer. Cache v3 replaces the previous design. The app supports portrait and landscape layouts.
 
 ## Checks
 
@@ -34,5 +33,4 @@ npm test
 npm run check
 ```
 
-The game engine is kept separate from the UI so multiplayer, more house rules, and additional game modes can be added later without replacing the card logic.
-
+No build step or dependencies are required. Serve the folder over HTTP when testing ES modules locally.

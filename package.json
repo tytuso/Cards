@@ -1,11 +1,11 @@
 {
   "name": "cards-matatu",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Cards — a modern, offline-ready Matatu game from Nile AI Solutions.",
+  "description": "A simple classic Ugandan Matatu game on a familiar wooden table.",
   "scripts": {
-    "test": "node --test",
+    "test": "node tests/game-engine.test.js",
     "check": "node --check src/app.js && node --check src/game-engine.js && node --check sw.js"
   }
 }
